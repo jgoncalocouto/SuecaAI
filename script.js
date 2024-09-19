@@ -75,7 +75,7 @@ function playCard(player, card) {
         return;
     }
     
-    playerHands[player] = playerHands[player].filter(c => c !== card);
+    playerHands[player] = playerHands[player].filter(c => c.rank !== card.rank || c.suit !== card.suit);
     trickCards.push({player, card});
     playedCards.push(card);
     
@@ -110,7 +110,7 @@ function playAITurn() {
 
 function endTrick() {
     const winningCard = determineWinningCard();
-    const winningPlayer = trickCards.find(tc => tc.card === winningCard).player;
+    const winningPlayer = trickCards.find(tc => tc.card.rank === winningCard.rank && tc.card.suit === winningCard.suit).player;
     const trickPoints = trickCards.reduce((sum, tc) => sum + points[tc.card.rank], 0);
     
     const winningTeam = Object.keys(teams).find(team => teams[team].includes(winningPlayer));
@@ -123,10 +123,11 @@ function endTrick() {
     currentPlayer = winningPlayer;
     trickStartPlayer = winningPlayer;
     
+    updateUI();
+    
     if (playerHands["Player 1"].length === 0) {
         endGame();
     } else {
-        updateUI();
         if (currentPlayer !== "Player 1") {
             setTimeout(playAITurn, 1000);
         }
