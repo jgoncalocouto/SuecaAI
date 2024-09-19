@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="game-container">
+        <h1>Card Game</h1>
+        <div id="trump-info">
+            <p>Trump Suit: <span id="trump-suit"></span></p>
+            <p>Trump Card: <span id="trump-card"></span></p>
+        </div>
+        <div id="player-hands">
+            <div class="player-hand" id="player1-hand">
+                <h2>Player 1 (You)</h2>
+                <div class="cards"></div>
+            </div>
+            <div class="player-hand" id="player2-hand">
+                <h2>Player 2</h2>
+                <div class="cards"></div>
+            </div>
+            <div class="player-hand" id="player3-hand">
+                <h2>Player 3</h2>
+                <div class="cards"></div>
+            </div>
+            <div class="player-hand" id="player4-hand">
+                <h2>Player 4</h2>
+                <div class="cards"></div>
+            </div>
+        </div>
+        <div id="game-info">
+            <p>Current Player: <span id="current-player"></span></p>
+            <p>Leading Suit: <span id="leading-suit"></span></p>
+        </div>
+        <div id="trick-area">
+            <h3>Current Trick</h3>
+            <div id="played-cards"></div>
+        </div>
+        <div id="scores">
+            <h3>Scores</h3>
+            <p>Team A: <span id="team-a-score">0</span></p>
+            <p>Team B: <span id="team-b-score">0</span></p>
+        </div>
+        <button id="start-game">Start Game</button>
+        <button id="play-card" style="display: none;">Play Card</button>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
