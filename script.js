@@ -65,6 +65,7 @@ function startGame() {
     trickCards = [];
     teamScores = {"Team A": 0, "Team B": 0};
     updateUI();
+    document.getElementById("next-play").disabled = true;
 }
 
 function playCard(player, card) {
@@ -86,11 +87,11 @@ function playCard(player, card) {
     updateUI();
     
     if (trickCards.length === 4) {
-        setTimeout(endTrick, 1000);
+        endTrick();
     } else {
         currentPlayer = players[(players.indexOf(currentPlayer) + 1) % 4];
         if (currentPlayer !== "Player 1") {
-            setTimeout(playAITurn, 1000);
+            playAITurn();
         }
     }
 }
@@ -105,7 +106,7 @@ function playAITurn() {
     const hand = playerHands[currentPlayer];
     const playableCards = hand.filter(card => isValidPlay(card));
     const chosenCard = playableCards[Math.floor(Math.random() * playableCards.length)];
-    playCard(currentPlayer, chosenCard);
+    setTimeout(() => playCard(currentPlayer, chosenCard), 500);
 }
 
 function endTrick() {
@@ -128,9 +129,7 @@ function endTrick() {
     if (playerHands["Player 1"].length === 0) {
         endGame();
     } else {
-        if (currentPlayer !== "Player 1") {
-            setTimeout(playAITurn, 1000);
-        }
+        document.getElementById("next-play").disabled = false;
     }
 }
 
@@ -152,6 +151,7 @@ function endGame() {
     const winner = teamScores["Team A"] > teamScores["Team B"] ? "Team A" : "Team B";
     showMessage(`Game Over! ${winner} wins with ${teamScores[winner]} points!`);
     document.getElementById("start-game").style.display = "block";
+    document.getElementById("next-play").disabled = true;
 }
 
 function updateUI() {
@@ -193,7 +193,20 @@ function showMessage(message) {
     setTimeout(() => messageElement.textContent = "", 3000);
 }
 
+function nextPlay() {
+    trickCards = [];
+    leadingSuit = null;
+    updateUI();
+    if (currentPlayer !== "Player 1") {
+        playAITurn();
+    } else {
+        showMessage("It's your turn. Please select a card to play.");
+    }
+    document.getElementById("next-play").disabled = true;
+}
+
 document.getElementById("start-game").addEventListener("click", startGame);
+document.getElementById("next-play").addEventListener("click", nextPlay);
 
 // Initialize the game
 startGame();
