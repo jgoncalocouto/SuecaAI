@@ -3,15 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Card Game</title>
+    <title>Tschau Sepp Card Game</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div id="game-container">
-        <h1>Card Game</h1>
-        <div id="trump-info">
+        <h1>Tschau Sepp Card Game</h1>
+        <div id="game-info">
             <p>Trump Suit: <span id="trump-suit"></span></p>
             <p>Trump Card: <span id="trump-card"></span></p>
+            <p>Current Player: <span id="current-player"></span></p>
+            <p>Leading Suit: <span id="leading-suit"></span></p>
         </div>
         <div id="player-hands">
             <div class="player-hand" id="player1-hand">
@@ -31,10 +33,6 @@
                 <div class="cards"></div>
             </div>
         </div>
-        <div id="game-info">
-            <p>Current Player: <span id="current-player"></span></p>
-            <p>Leading Suit: <span id="leading-suit"></span></p>
-        </div>
         <div id="trick-area">
             <h3>Current Trick</h3>
             <div id="played-cards"></div>
@@ -44,8 +42,8 @@
             <p>Team A: <span id="team-a-score">0</span></p>
             <p>Team B: <span id="team-b-score">0</span></p>
         </div>
-        <button id="start-game">Start Game</button>
-        <button id="play-card" style="display: none;">Play Card</button>
+        <button id="start-game">Start New Game</button>
+        <div id="message"></div>
     </div>
     <script src="script.js"></script>
 </body>
