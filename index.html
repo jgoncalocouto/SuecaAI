@@ -1,51 +1,58 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tschau Sepp Card Game</title>
+    <title>Sueca.AI</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div id="game-container">
-        <h1>Tschau Sepp Card Game</h1>
+        <h1>Sueca.AI</h1>
+
         <div id="game-info">
-            <p>Trump Suit: <span id="trump-suit"></span></p>
-            <p>Trump Card: <span id="trump-card"></span></p>
-            <p>Current Player: <span id="current-player"></span></p>
-            <p>Leading Suit: <span id="leading-suit"></span></p>
+            <p>Naipe de Trunfo: <span id="trump-suit"></span></p>
+            <p>Carta de Trunfo: <span id="trump-card"></span></p>
+            <p>Jogador Atual: <span id="current-player"></span></p>
+            <p>Naipe a assistir: <span id="leading-suit"></span></p>
         </div>
+
         <div id="player-hands">
-            <div class="player-hand" id="player1-hand">
-                <h2>Player 1 (You)</h2>
+            <div id="player1-hand" class="player-hand">
+                <h2>Jogador 1 (You)</h2>
                 <div class="cards"></div>
             </div>
-            <div class="player-hand" id="player2-hand">
-                <h2>Player 2</h2>
+            <div id="player2-hand" class="player-hand">
+                <h2>Jogador 2</h2>
                 <div class="cards"></div>
             </div>
-            <div class="player-hand" id="player3-hand">
-                <h2>Player 3</h2>
+            <div id="player3-hand" class="player-hand">
+                <h2>Jogador 3</h2>
                 <div class="cards"></div>
             </div>
-            <div class="player-hand" id="player4-hand">
-                <h2>Player 4</h2>
+            <div id="player4-hand" class="player-hand">
+                <h2>Jogador 4</h2>
                 <div class="cards"></div>
             </div>
         </div>
+
         <div id="trick-area">
-            <h3>Current Trick</h3>
+            <h3>Jogada Atual</h3>
             <div id="played-cards"></div>
         </div>
+
         <div id="scores">
-            <h3>Scores</h3>
-            <p>Team A: <span id="team-a-score">0</span></p>
-            <p>Team B: <span id="team-b-score">0</span></p>
+            <h3>Pontos</h3>
+            <p>Equipa A (1+3): <span id="team-a-score">0</span></p>
+            <p>Equipa B (2+4): <span id="team-b-score">0</span></p>
         </div>
-        <button id="start-game">Start New Game</button>
-        <button id="next-play">Next Play</button>
+
+        <button id="start-game">Começar novo jogo</button>
+        <button id="next-play">Avançar para a proxima jogada</button>
+
         <div id="message"></div>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>

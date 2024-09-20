@@ -64,20 +64,45 @@ body {
     transform: translateY(-5px);
 }
 
+
 .card.played {
-    opacity: 0.5;
+    position: relative;
+    width: 80px;
+    height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 5px;
+    box-sizing: border-box;
+}
+
+.card.played .player-name {
+    position: absolute;
+    top: -20px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 12px;
+    font-weight: bold;
+    color: #333;
+}
+
+.card.played .card-value {
+    font-size: 16px;
+    text-align: center;
+}
+
+#played-cards {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 30px;
 }
 
 #trick-area {
     margin-top: 20px;
 }
 
-#played-cards {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 10px;
-}
 
 #scores {
     margin-top: 20px;
