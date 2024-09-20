@@ -52,28 +52,43 @@ body {
     border: 1px solid #000;
     border-radius: 5px;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    justify-content: space-between;
     align-items: center;
     cursor: pointer;
-    font-size: 14px;
     background-color: white;
     transition: transform 0.1s;
+    position: relative;
+    padding: 5px;
+    box-sizing: border-box;
 }
 
 .card:hover {
     transform: translateY(-5px);
 }
 
-
-.card.played {
-    position: relative;
-    width: 80px;
-    height: 120px;
+.card .card-value {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    padding: 5px;
-    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+}
+
+.card .card-rank {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.card .card-suit {
+    font-size: 36px;
+    line-height: 1;
+}
+
+.card.played {
+    width: 80px;
+    height: 120px;
 }
 
 .card.played .player-name {
@@ -88,8 +103,12 @@ body {
 }
 
 .card.played .card-value {
-    font-size: 16px;
+    font-size: 18px;
     text-align: center;
+}
+
+.card.played .card-suit {
+    font-size: 48px;
 }
 
 #played-cards {

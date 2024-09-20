@@ -7,6 +7,13 @@ const teams = {
     "Team A": ["Player 1", "Player 3"],
     "Team B": ["Player 2", "Player 4"]
 };
+const suitSymbols = {
+    "Spades": "♠",
+    "Hearts": "♥",
+    "Clubs": "♣",
+    "Diamonds": "♦"
+};
+
 
 // Game state
 let deck = [];
@@ -20,6 +27,55 @@ let teamScores = {"Team A": 0, "Team B": 0};
 let trickCards = [];
 let trickStartPlayer;
 
+function getColoredSuitSymbol(suit) {
+    const symbol = suitSymbols[suit];
+    const color = (suit === "Hearts" || suit === "Diamonds") ? "red" : "black";
+    return `<span class="card-suit" style="color: ${color};">${symbol}</span>`;
+}
+
+function updateUI() {
+    document.getElementById("trump-suit").innerHTML = getColoredSuitSymbol(trumpSuit);
+    document.getElementById("trump-card").innerHTML = `${trumpCard.rank} ${getColoredSuitSymbol(trumpCard.suit)}`;
+    document.getElementById("current-player").textContent = currentPlayer;
+    document.getElementById("leading-suit").innerHTML = leadingSuit ? getColoredSuitSymbol(leadingSuit) : "None";
+    
+    for (let player of players) {
+        const handElement = document.querySelector(`#${player.toLowerCase().replace(" ", "")}-hand .cards`);
+        handElement.innerHTML = "";
+        playerHands[player].forEach(card => {
+            const cardElement = document.createElement("div");
+            cardElement.className = "card";
+            cardElement.innerHTML = `
+                <div class="card-value">
+                    <span class="card-rank">${card.rank}</span>
+                    ${getColoredSuitSymbol(card.suit)}
+                </div>
+            `;
+            if (player === "Player 1") {
+                cardElement.onclick = () => playCard("Player 1", card);
+            }
+            handElement.appendChild(cardElement);
+        });
+    }
+    
+    const playedCardsElement = document.getElementById("played-cards");
+    playedCardsElement.innerHTML = "";
+    trickCards.forEach(tc => {
+        const cardElement = document.createElement("div");
+        cardElement.className = "card played";
+        cardElement.innerHTML = `
+            <span class="player-name">${tc.player}</span>
+            <div class="card-value">
+                <span class="card-rank">${tc.card.rank}</span>
+                ${getColoredSuitSymbol(tc.card.suit)}
+            </div>
+        `;
+        playedCardsElement.appendChild(cardElement);
+    });
+    
+    document.getElementById("team-a-score").textContent = teamScores["Team A"];
+    document.getElementById("team-b-score").textContent = teamScores["Team B"];
+}
 function createAndShuffleDeck() {
     deck = [];
     for (let suit of suits) {
@@ -233,10 +289,10 @@ function endGame() {
 }
 
 function updateUI() {
-    document.getElementById("trump-suit").textContent = trumpSuit;
-    document.getElementById("trump-card").textContent = `${trumpCard.rank} of ${trumpCard.suit}`;
+    document.getElementById("trump-suit").innerHTML = getColoredSuitSymbol(trumpSuit);
+    document.getElementById("trump-card").innerHTML = `${trumpCard.rank} ${getColoredSuitSymbol(trumpCard.suit)}`;
     document.getElementById("current-player").textContent = currentPlayer;
-    document.getElementById("leading-suit").textContent = leadingSuit || "None";
+    document.getElementById("leading-suit").innerHTML = leadingSuit ? getColoredSuitSymbol(leadingSuit) : "None";
     
     for (let player of players) {
         const handElement = document.querySelector(`#${player.toLowerCase().replace(" ", "")}-hand .cards`);
@@ -244,7 +300,7 @@ function updateUI() {
         playerHands[player].forEach(card => {
             const cardElement = document.createElement("div");
             cardElement.className = "card";
-            cardElement.textContent = `${card.rank} ${card.suit.charAt(0)}`;
+            cardElement.innerHTML = `${card.rank} ${getColoredSuitSymbol(card.suit)}`;
             if (player === "Player 1") {
                 cardElement.onclick = () => playCard("Player 1", card);
             }
@@ -259,7 +315,7 @@ function updateUI() {
         cardElement.className = "card played";
         cardElement.innerHTML = `
             <span class="player-name">${tc.player}</span>
-            <span class="card-value">${tc.card.rank} ${tc.card.suit.charAt(0)}</span>
+            <span class="card-value">${tc.card.rank} ${getColoredSuitSymbol(tc.card.suit)}</span>
         `;
         playedCardsElement.appendChild(cardElement);
     });
@@ -267,6 +323,7 @@ function updateUI() {
     document.getElementById("team-a-score").textContent = teamScores["Team A"];
     document.getElementById("team-b-score").textContent = teamScores["Team B"];
 }
+
 function showMessage(message) {
     const messageElement = document.getElementById("message");
     messageElement.textContent = message;
