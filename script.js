@@ -26,6 +26,13 @@ let playedCards = [];
 let teamScores = {"Team A": 0, "Team B": 0};
 let trickCards = [];
 let trickStartPlayer;
+let isDeveloperMode = false;
+
+function toggleMode() {
+    isDeveloperMode = !isDeveloperMode;
+    updateUI();
+    document.getElementById("mode-toggle").textContent = isDeveloperMode ? "Switch to User Mode" : "Switch to Developer Mode";
+}
 
 function getColoredSuitSymbol(suit) {
     const symbol = suitSymbols[suit];
@@ -297,15 +304,24 @@ function updateUI() {
     for (let player of players) {
         const handElement = document.querySelector(`#${player.toLowerCase().replace(" ", "")}-hand .cards`);
         handElement.innerHTML = "";
-        playerHands[player].forEach(card => {
-            const cardElement = document.createElement("div");
-            cardElement.className = "card";
-            cardElement.innerHTML = `${card.rank} ${getColoredSuitSymbol(card.suit)}`;
-            if (player === "Player 1") {
-                cardElement.onclick = () => playCard("Player 1", card);
-            }
-            handElement.appendChild(cardElement);
-        });
+        if (isDeveloperMode || player === "Player 1") {
+            playerHands[player].forEach(card => {
+                const cardElement = document.createElement("div");
+                cardElement.className = "card";
+                cardElement.innerHTML = `
+                    <div class="card-value">
+                        <span class="card-rank">${card.rank}</span>
+                        ${getColoredSuitSymbol(card.suit)}
+                    </div>
+                `;
+                if (player === "Player 1") {
+                    cardElement.onclick = () => playCard("Player 1", card);
+                }
+                handElement.appendChild(cardElement);
+            });
+        } else {
+            handElement.innerHTML = `<div class="card-back">${playerHands[player].length}</div>`;
+        }
     }
     
     const playedCardsElement = document.getElementById("played-cards");
@@ -315,7 +331,10 @@ function updateUI() {
         cardElement.className = "card played";
         cardElement.innerHTML = `
             <span class="player-name">${tc.player}</span>
-            <span class="card-value">${tc.card.rank} ${getColoredSuitSymbol(tc.card.suit)}</span>
+            <div class="card-value">
+                <span class="card-rank">${tc.card.rank}</span>
+                ${getColoredSuitSymbol(tc.card.suit)}
+            </div>
         `;
         playedCardsElement.appendChild(cardElement);
     });
@@ -323,7 +342,6 @@ function updateUI() {
     document.getElementById("team-a-score").textContent = teamScores["Team A"];
     document.getElementById("team-b-score").textContent = teamScores["Team B"];
 }
-
 function showMessage(message) {
     const messageElement = document.getElementById("message");
     messageElement.textContent = message;
@@ -349,6 +367,7 @@ function nextPlay() {
 
 document.getElementById("start-game").addEventListener("click", startGame);
 document.getElementById("next-play").addEventListener("click", nextPlay);
+document.getElementById("mode-toggle").addEventListener("click", toggleMode);
 
 // Initialize the game
 startGame();
