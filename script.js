@@ -14,7 +14,6 @@ const suitSymbols = {
     "Diamonds": "♦"
 };
 
-
 // Game state
 let deck = [];
 let playerHands = {};
@@ -49,40 +48,66 @@ function updateUI() {
     for (let player of players) {
         const handElement = document.querySelector(`#${player.toLowerCase().replace(" ", "")}-hand .cards`);
         handElement.innerHTML = "";
-        playerHands[player].forEach(card => {
-            const cardElement = document.createElement("div");
-            cardElement.className = "card";
-            cardElement.innerHTML = `
-                <div class="card-value">
-                    <span class="card-rank">${card.rank}</span>
-                    ${getColoredSuitSymbol(card.suit)}
-                </div>
-            `;
-            if (player === "Player 1") {
-                cardElement.onclick = () => playCard("Player 1", card);
-            }
-            handElement.appendChild(cardElement);
-        });
+        if (isDeveloperMode || player === "Player 1") {
+            playerHands[player].forEach(card => {
+                const cardElement = document.createElement("div");
+                cardElement.className = "card";
+                cardElement.innerHTML = `
+                    <div class="card-value">
+                        <span class="card-rank">${card.rank}</span>
+                        ${getColoredSuitSymbol(card.suit)}
+                    </div>
+                `;
+                if (player === "Player 1") {
+                    cardElement.onclick = () => playCard("Player 1", card);
+                }
+                handElement.appendChild(cardElement);
+            });
+        } else {
+            handElement.innerHTML = `<div class="card-back">${playerHands[player].length}</div>`;
+        }
     }
     
     const playedCardsElement = document.getElementById("played-cards");
     playedCardsElement.innerHTML = "";
-    trickCards.forEach(tc => {
-        const cardElement = document.createElement("div");
-        cardElement.className = "card played";
-        cardElement.innerHTML = `
-            <span class="player-name">${tc.player}</span>
-            <div class="card-value">
-                <span class="card-rank">${tc.card.rank}</span>
-                ${getColoredSuitSymbol(tc.card.suit)}
-            </div>
-        `;
-        playedCardsElement.appendChild(cardElement);
+    const orderedPlayers = ["Player 3", "Player 2", "Player 1", "Player 4"];
+    orderedPlayers.forEach(player => {
+        const tc = trickCards.find(card => card.player === player);
+        if (tc) {
+            const cardElement = document.createElement("div");
+            cardElement.className = "card played";
+            cardElement.innerHTML = `
+                <span class="player-name">${tc.player}</span>
+                <div class="card-value">
+                    <span class="card-rank">${tc.card.rank}</span>
+                    ${getColoredSuitSymbol(tc.card.suit)}
+                </div>
+            `;
+            playedCardsElement.appendChild(cardElement);
+        }
     });
     
     document.getElementById("team-a-score").textContent = teamScores["Team A"];
     document.getElementById("team-b-score").textContent = teamScores["Team B"];
+
+    // Update the visibility of game controls
+    document.getElementById("start-game").style.display = 
+        playerHands["Player 1"].length === 0 ? "block" : "none";
+    document.getElementById("next-play").disabled = 
+        trickCards.length < 4 || playerHands["Player 1"].length === 0;
+
+    // Update the message display
+    const messageElement = document.getElementById("message");
+    if (playerHands["Player 1"].length === 0) {
+        const winner = teamScores["Team A"] > teamScores["Team B"] ? "Team A" : "Team B";
+        messageElement.textContent = `Game Over! ${winner} wins with ${teamScores[winner]} points!`;
+    } else if (currentPlayer === "Player 1" && trickCards.length < 4) {
+        messageElement.textContent = "It's your turn. Please select a card to play.";
+    } else {
+        messageElement.textContent = "";
+    }
 }
+
 function createAndShuffleDeck() {
     deck = [];
     for (let suit of suits) {
@@ -139,7 +164,6 @@ function playCard(player, card) {
         return;
     }
 
-    // Ensure the card is valid
     if (!card || !card.rank || !card.suit) {
         console.error("Invalid card played: ", card);
         return;
@@ -179,78 +203,10 @@ function playAITurn() {
 }
 
 function endTrick() {
-    console.log("Trick Cards:", trickCards); // Log the current trick cards
+    console.log("Trick Cards:", trickCards);
     
     const winningCard = determineWinningCard();
     
-    // Check if winningCard is valid
-    if (!winningCard) {
-        console.error("No winning card could be determined.");
-        showMessage("No valid card to determine the winner. Check the game logic.");
-        return;
-    }
-    
-    const winningPlayer = trickCards.find(tc => tc.card.rank === winningCard.rank && tc.card.suit === winningCard.suit)?.player;
-    
-    // Check if winningPlayer is valid
-    if (!winningPlayer) {
-        console.error("No winning player found for card:", winningCard);
-        return;
-    }
-    
-    const trickPoints = trickCards.reduce((sum, tc) => sum + points[tc.card.rank], 0);
-    
-    const winningTeam = Object.keys(teams).find(team => teams[team].includes(winningPlayer));
-    teamScores[winningTeam] += trickPoints;
-
-    showMessage(`${winningPlayer} wins the trick! (${trickPoints} points)`);
-
-    currentPlayer = winningPlayer;
-    trickStartPlayer = winningPlayer;
-
-    updateUI();
-
-    if (playerHands["Player 1"].length === 0) {
-        endGame();
-    } else {
-        document.getElementById("next-play").disabled = false;
-    }
-}
-function determineWinningCard() {
-    // Ensure all trick cards have valid rank and suit
-    const validTrickCards = trickCards.filter(tc => tc && tc.card && tc.card.rank && tc.card.suit);
-
-    if (validTrickCards.length === 0) {
-        console.error("No valid cards in the trick", trickCards);
-        return null;
-    }
-
-    const trumpCards = validTrickCards.filter(tc => tc.card.suit === trumpSuit);
-
-    if (trumpCards.length > 0) {
-        return trumpCards.reduce((highest, current) => 
-            ranks.indexOf(current.card.rank) < ranks.indexOf(highest.card.rank) ? current : highest
-        ).card;
-    }
-
-    const leadingSuitCards = validTrickCards.filter(tc => tc.card.suit === leadingSuit);
-    
-    if (leadingSuitCards.length > 0) {
-        return leadingSuitCards.reduce((highest, current) => 
-            ranks.indexOf(current.card.rank) < ranks.indexOf(highest.card.rank) ? current : highest
-        ).card;
-    }
-
-    // If no valid cards are found, return the first valid card
-    return validTrickCards[0].card;
-}
-
-function endTrick() {
-    console.log("Trick Cards:", trickCards); // Log the current trick cards
-    
-    const winningCard = determineWinningCard();
-    
-    // Check if winningCard is valid
     if (!winningCard) {
         console.error("No winning card could be determined.");
         showMessage("No valid card to determine the winner. Check the game logic.");
@@ -263,7 +219,6 @@ function endTrick() {
         tc.card.suit === winningCard.suit
     )?.player;
     
-    // Check if winningPlayer is valid
     if (!winningPlayer) {
         console.error("No winning player found for card:", winningCard);
         return;
@@ -288,6 +243,33 @@ function endTrick() {
     }
 }
 
+function determineWinningCard() {
+    const validTrickCards = trickCards.filter(tc => tc && tc.card && tc.card.rank && tc.card.suit);
+
+    if (validTrickCards.length === 0) {
+        console.error("No valid cards in the trick", trickCards);
+        return null;
+    }
+
+    const trumpCards = validTrickCards.filter(tc => tc.card.suit === trumpSuit);
+
+    if (trumpCards.length > 0) {
+        return trumpCards.reduce((highest, current) => 
+            ranks.indexOf(current.card.rank) < ranks.indexOf(highest.card.rank) ? current : highest
+        ).card;
+    }
+
+    const leadingSuitCards = validTrickCards.filter(tc => tc.card.suit === leadingSuit);
+    
+    if (leadingSuitCards.length > 0) {
+        return leadingSuitCards.reduce((highest, current) => 
+            ranks.indexOf(current.card.rank) < ranks.indexOf(highest.card.rank) ? current : highest
+        ).card;
+    }
+
+    return validTrickCards[0].card;
+}
+
 function endGame() {
     const winner = teamScores["Team A"] > teamScores["Team B"] ? "Team A" : "Team B";
     showMessage(`Game Over! ${winner} wins with ${teamScores[winner]} points!`);
@@ -295,53 +277,6 @@ function endGame() {
     document.getElementById("next-play").disabled = true;
 }
 
-function updateUI() {
-    document.getElementById("trump-suit").innerHTML = getColoredSuitSymbol(trumpSuit);
-    document.getElementById("trump-card").innerHTML = `${trumpCard.rank} ${getColoredSuitSymbol(trumpCard.suit)}`;
-    document.getElementById("current-player").textContent = currentPlayer;
-    document.getElementById("leading-suit").innerHTML = leadingSuit ? getColoredSuitSymbol(leadingSuit) : "None";
-    
-    for (let player of players) {
-        const handElement = document.querySelector(`#${player.toLowerCase().replace(" ", "")}-hand .cards`);
-        handElement.innerHTML = "";
-        if (isDeveloperMode || player === "Player 1") {
-            playerHands[player].forEach(card => {
-                const cardElement = document.createElement("div");
-                cardElement.className = "card";
-                cardElement.innerHTML = `
-                    <div class="card-value">
-                        <span class="card-rank">${card.rank}</span>
-                        ${getColoredSuitSymbol(card.suit)}
-                    </div>
-                `;
-                if (player === "Player 1") {
-                    cardElement.onclick = () => playCard("Player 1", card);
-                }
-                handElement.appendChild(cardElement);
-            });
-        } else {
-            handElement.innerHTML = `<div class="card-back">${playerHands[player].length}</div>`;
-        }
-    }
-    
-    const playedCardsElement = document.getElementById("played-cards");
-    playedCardsElement.innerHTML = "";
-    trickCards.forEach(tc => {
-        const cardElement = document.createElement("div");
-        cardElement.className = "card played";
-        cardElement.innerHTML = `
-            <span class="player-name">${tc.player}</span>
-            <div class="card-value">
-                <span class="card-rank">${tc.card.rank}</span>
-                ${getColoredSuitSymbol(tc.card.suit)}
-            </div>
-        `;
-        playedCardsElement.appendChild(cardElement);
-    });
-    
-    document.getElementById("team-a-score").textContent = teamScores["Team A"];
-    document.getElementById("team-b-score").textContent = teamScores["Team B"];
-}
 function showMessage(message) {
     const messageElement = document.getElementById("message");
     messageElement.textContent = message;
@@ -359,7 +294,6 @@ function nextPlay() {
         showMessage("It's your turn. Please select a card to play.");
     }
     
-    // Re-enable the next play button once the AI finishes its turn or after the trick completes
     setTimeout(() => {
         document.getElementById("next-play").disabled = true;
     }, 1000);
